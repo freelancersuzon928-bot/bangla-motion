@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>বাংলা মোশন টেক্সট ভিডিও</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#0b0f1a; color:#e5e7eb; font-family:'Noto Sans Bengali',sans-serif; padding:16px; }
+
+  .controls { max-width:900px; margin:0 auto; display:grid; gap:10px; }
+  textarea { width:100%; height:240px; background:#111827; color:#f8fafc; border:1px solid #334155; border-radius:8px; padding:10px; font-family:inherit; font-size:15px; line-height:1.7; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  button, select { background:#1e293b; color:#f8fafc; border:1px solid #334155; border-radius:8px; padding:8px 14px; font-family:inherit; font-size:14px; cursor:pointer; }
+  button:hover, select:hover { border-color:#22d3ee; }
+  button.primary { background:#0891b2; border-color:#0891b2; }
+  .hint { font-size:13px; color:#94a3b8; line-height:1.7; }
+  .status { font-size:14px; color:#94a3b8; min-height:20px; line-height:1.6; }
+
+  .stage-wrap { display:flex; justify-content:center; margin:20px 0 40px; }
+  #stage { position:relative; overflow:hidden; border-radius:14px; box-shadow:0 0 0 1px #334155, 0 20px 60px rgba(0,0,0,.5); }
+  #stage.vertical { width:360px; height:640px; }
+  #stage.horizontal { width:854px; height:480px; max-width:100%; }
+
+  .bg { position:absolute; inset:0; background:radial-gradient(circle at 50% 30%, #13233d 0%, #070b14 70%); }
+  .orb { position:absolute; border-radius:50%; filter:blur(70px); opacity:.35; animation:float 14s ease-in-out infinite alternate; }
+  .o1 { width:260px; height:260px; background:#0891b2; top:-70px; left:-70px; }
+  .o2 { width:300px; height:300px; background:#7c3aed; bottom:-90px; right:-90px; animation-delay:-7s; }
+  @keyframes float { to { transform:translate(40px,30px) scale(1.1); } }
+
+  .grid { position:absolute; inset:0; background-image:linear-gradient(rgba(34,211,238,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.06) 1px,transparent 1px); background-size:40px 40px; }
+
+  #progress { position:absolute; top:0; left:0; height:4px; width:0; background:linear-gradient(90deg,#22d3ee,#facc15); z-index:5; }
+  #counter { position:absolute; bottom:12px; right:14px; font-size:12px; color:#64748b; z-index:5; }
+
+  .scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:36px 28px; text-align:center; z-index:2; pointer-events:none;
+    opacity:0; transform:translateY(30px) scale(.96); filter:blur(6px);
+    transition:opacity .6s ease, transform .7s cubic-bezier(.2,.8,.2,1), filter .6s ease; }
+  .scene.active { opacity:1; transform:none; filter:none; }
+
+  .box { display:flex; flex-direction:column; align-items:center; max-width:100%; max-height:100%; }
+  .bar { display:block; height:4px; width:0; margin-bottom:18px; border-radius:2px; background:linear-gradient(90deg,#22d3ee,#facc15);
+    transition:width .8s ease .35s; }
+  .scene.active .bar { width:70px; }
+
+  .txt { font-weight:700; line-height:1.8; color:#f8fafc; text-shadow:0 2px 14px rgba(0,0,0,.7); overflow-wrap:anywhere; max-width:100%; }
+
+  .txt em { font-style:normal; font-weight:900; color:#facc15; }
+  .scene.active .txt em { animation:glow 1.8s ease-in-out infinite alternate; }
+  @keyframes glow {
+    from { text-shadow:0 0 4px rgba(250,204,21,.15); }
+    to   { text-shadow:0 0 18px rgba(250,204,21,.85); }
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <textarea id="script">একটি ভবন... যার নির্মাণ শুরু হয়েছিল এক দেশে, আর শেষ হয়েছিল আরেক দেশে।
+যে স্থপতি এর নকশা করেছিলেন, তিনি নিজের চোখে এর পূর্ণ রূপ দেখে যেতে পারেননি।
+আর আজ এই ভবনই একটি জাতির গণতন্ত্রের হৃৎস্পন্দন।
+এটা জাতীয় সংসদ ভবনের গল্প।
+ঢাকার শেরে বাংলা নগরে লেকের জলে নিজের ছায়া দেখে দাঁড়িয়ে আছে কংক্রিটের এক বিশাল স্থাপনা। এটা বাংলাদেশের জাতীয় সংসদের প্রধান ভবন। দেশের আইন তৈরি হয় এখানেই, আর জাতির ভবিষ্যৎ নিয়ে সিদ্ধান্তও নেওয়া হয় এই দেয়ালের ভেতরে।
+এর মূল স্থপতি ছিলেন বিখ্যাত মার্কিন স্থপতি লুই আই. কান। আলো, ছায়া আর জ্যামিতি দিয়ে তিনি এমন এক স্থাপত্য গড়েছিলেন, যা আজও সারা পৃথিবীর স্থপতিদের অবাক করে।
+গল্পের শুরু ১৯৬১ সালে।
+তখন বাংলাদেশ ছিল পূর্ব পাকিস্তান। তৎকালীন পাকিস্তান সরকার পূর্ব ও পশ্চিম পাকিস্তানের আইনসভার জন্য এই ভবনের নির্মাণকাজ শুরু করে।
+কিন্তু ইতিহাস অন্য পথে হাঁটল।
+১৯৭১। রক্তক্ষয়ী মুক্তিযুদ্ধ। জন্ম নিল নতুন রাষ্ট্র বাংলাদেশ। থেমে যাওয়া নির্মাণকাজ আবার শুরু হলো, তবে এবার এক স্বাধীন জাতির স্বপ্ন নিয়ে।
+এই দীর্ঘ সময়ে সংসদের কাজ কোথায় চলত?
+প্রথম ও দ্বিতীয় সংসদ নির্বাচনের পর গঠিত সংসদের অধিবেশন বসত পুরান সংসদ ভবনে। সেই ভবনটি এখন প্রধানমন্ত্রীর কার্যালয় হিসেবে ব্যবহার হচ্ছে।
+অবশেষে এলো সেই দিন।
+১৯৮২ সালের ২৮শে জানুয়ারি। দুই দশকেরও বেশি সময় পর শেষ হলো নির্মাণকাজ।
+আর ঠিক আঠারো দিন পর, ১৫ই ফেব্রুয়ারি, বাংলাদেশের দ্বিতীয় সংসদের অষ্টম এবং শেষ অধিবেশন বসল এই নতুন ভবনে। প্রথমবারের মতো জেগে উঠল জাতীয় সংসদ ভবন।
+সেদিন থেকে আজ পর্যন্ত আইন প্রণয়ন আর রাষ্ট্র পরিচালনার মূল কেন্দ্র এই ভবন।
+এটা শুধু ইট, পাথর আর কংক্রিট নয়।
+এটা একটি জাতির সংগ্রাম, স্বপ্ন আর আত্মপরিচয়ের প্রতীক।
+জাতীয় সংসদ ভবন। বাংলাদেশের গর্ব।</textarea>
+
+  <div class="hint">
+    প্রতি লাইনে আলাদা করে লেখো। ভয়েস ফাইল দিলে টুল নিজেই প্রতিটি লাইনকে ভয়েসের দৈর্ঘ্য অনুযায়ী ভাগ করে দেবে, তাই আলাদা সময় লেখার দরকার নেই। ভয়েস শেষ হলে ভিডিও নিজে থেমে যাবে (এবং রেকর্ড হলে ফাইল ডাউনলোড হবে)। কোনো শব্দ হাইলাইট করতে <b>&lt;em&gt;...&lt;/em&gt;</b> দিয়ে মোড়ো।
+  </div>
+
+  <div class="row">
+    <label>ফরম্যাট:
+      <select id="format">
+        <option value="vertical">9:16 (Reels/Shorts)</option>
+        <option value="horizontal">16:9 (ল্যান্ডস্কেপ)</option>
+      </select>
+    </label>
+    <label>ভয়েস ফাইল: <input type="file" id="audio" accept="audio/*"></label>
+  </div>
+
+  <div class="row">
+    <button id="play" class="primary">▶ চালাও</button>
+    <button id="rec">⏺ রেকর্ড শুরু</button>
+    <button id="stop">⏹ থামাও</button>
+  </div>
+
+  <div class="status" id="status">লেখা দাও, ভয়েস ফাইল দাও, তারপর চালাও।</div>
+</div>
+
+<div class="stage-wrap">
+  <div id="stage" class="vertical">
+    <div class="bg"></div>
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="grid"></div>
+    <div id="progress"></div>
+    <div id="counter"></div>
+  </div>
+</div>
+
+<audio id="player"></audio>
+
+<script>
+const LINE_CHARS_PER_SEC = 10;   // লেখা পড়ার গড় গতি (অক্ষর/সেকেন্ড), ভয়েস না থাকলে এটা দিয়ে সময় ঠিক হবে
+const MIN_LINE_SEC = 2.5;        // ভয়েস ছাড়া প্রতিটি লাইন অন্তত এতক্ষণ থাকবে
+const FADE_OUT_SEC = 0.4;        // পরের লাইনের আগে ফেড-আউটের সময়
+const TAIL_SEC = 1.0;            // ভয়েস শেষ হওয়ার পর একটু অতিরিক্ত সময়
+
+const stage = document.getElementById('stage');
+const formatSel = document.getElementById('format');
+const scriptEl = document.getElementById('script');
+const audioInput = document.getElementById('audio');
+const player = document.getElementById('player');
+const playBtn = document.getElementById('play');
+const recBtn = document.getElementById('rec');
+const stopBtn = document.getElementById('stop');
+const statusEl = document.getElementById('status');
+const progress = document.getElementById('progress');
+const counter = document.getElementById('counter');
+
+let items = [], total = 0, startTime = 0, rafId = null, running = false;
+let recorder = null, chunks = [], screenStream = null;
+let audioLength = 0;
+
+function escapeHtml(text) {
+  return text.replace(/</g, '&lt;').replace(/&lt;(\/?)em&gt;/g, '<$1em>');
+}
+
+function plainLength(html) {
+  return html.replace(/<[^>]+>/g, '').replace(/\s/g, '').length;
+}
+
+// লাইনগুলো পড়ে প্রতিটির শুরু ও সময়কাল ঠিক করে
+function buildTimeline() {
+  const raw = scriptEl.value.split('\n').map(l => l.trim()).filter(Boolean);
+  const list = raw.map(line => {
+    const html = escapeHtml(line);
+    const weight = Math.max(1, plainLength(html));  // লেখার দৈর্ঘ্যই ওজন
+    return { html, weight };
+  });
+  if (!list.length) return [];
+
+  const totalWeight = list.reduce((s, it) => s + it.weight, 0);
+
+  let duration;
+  if (audioLength > 0) {
+    // ভয়েস থাকলে পুরো ভয়েসের দৈর্ঘ্যকে লেখার অনুপাতে ভাগ করা
+    duration = audioLength - 0.2;
+  } else {
+    // ভয়েস না থাকলে লেখার দৈর্ঘ্য অনুযায়ী সময়
+    duration = list.reduce((s, it) => s + Math.max(MIN_LINE_SEC, it.weight / LINE_CHARS_PER_SEC + 1), 0);
+  }
+
+  let cursor = 0;
+  list.forEach(it => {
+    const share = audioLength > 0
+      ? (it.weight / totalWeight) * duration
+      : Math.max(MIN_LINE_SEC, it.weight / LINE_CHARS_PER_SEC + 1);
+    it.t = cursor;
+    it.dur = share;
+    cursor += share;
+  });
+  return list;
+}
+
+// লেখা যত লম্বা, ফন্ট তত ছোট, যাতে পুরো লেখা ফ্রেমের ভেতরে থাকে
+function fontSizeFor(html) {
+  const vertical = stage.classList.contains('vertical');
+  const base = vertical ? 30 : 38;
+  const len = plainLength(html);
+  let scale = 1;
+  if (len > 150) scale = 0.5;
+  else if (len > 110) scale = 0.6;
+  else if (len > 80) scale = 0.72;
+  else if (len > 55) scale = 0.85;
+  return Math.round(base * scale) + 'px';
+}
+
+function buildScenes() {
+  stage.querySelectorAll('.scene').forEach(s => s.remove());
+  items.forEach(it => {
+    const div = document.createElement('div');
+    div.className = 'scene';
+    div.innerHTML = '<div class="box"><span class="bar"></span><div class="txt" style="font-size:' + fontSizeFor(it.html) + '">' + it.html + '</div></div>';
+    stage.insertBefore(div, progress);
+  });
+}
+
+function setFormat() {
+  stage.className = formatSel.value;
+  if (items.length) buildScenes();
+}
+formatSel.addEventListener('change', setFormat);
+setFormat();
+
+audioInput.addEventListener('change', () => {
+  const file = audioInput.files[0];
+  if (!file) return;
+  player.src = URL.createObjectURL(file);
+  statusEl.textContent = 'ভয়েস যুক্ত হচ্ছে...';
+});
+
+player.addEventListener('loadedmetadata', () => {
+  audioLength = isFinite(player.duration) ? player.duration : 0;
+  statusEl.textContent = 'ভয়েস যুক্ত হয়েছে। দৈর্ঘ্য: ' + audioLength.toFixed(1) + ' সেকেন্ড। এখন চালাও বা রেকর্ড করো।';
+});
+
+player.addEventListener('error', () => {
+  statusEl.textContent = 'ভয়েস ফাইলটি চালানো যাচ্ছে না। MP3 বা WAV ফাইল দাও।';
+});
+
+// ভয়েস শেষ হলে ভিডিও নিজে থেকে থামবে
+player.addEventListener('ended', () => {
+  if (running) finish('ভয়েস শেষ হয়েছে, ভিডিও থেমেছে।');
+});
+
+function render(time) {
+  const scenes = stage.querySelectorAll('.scene');
+  let idx = -1;
+  items.forEach((it, i) => {
+    const isLast = i === items.length - 1;
+    const end = isLast ? total : it.t + it.dur - FADE_OUT_SEC;
+    if (time >= it.t && time < end) idx = i;
+  });
+  scenes.forEach((s, i) => s.classList.toggle('active', i === idx));
+  progress.style.width = Math.min(time / total, 1) * 100 + '%';
+  counter.textContent = idx >= 0 ? (idx + 1) + ' / ' + items.length : '';
+}
+
+function currentTime() {
+  if (player.src && !player.paused && !player.ended) return player.currentTime;
+  return (performance.now() - startTime) / 1000;
+}
+
+function tick() {
+  if (!running) return;
+  const time = currentTime();
+  render(time);
+  if (time >= total) {
+    finish('শেষ হয়েছে।');
+    return;
+  }
+  rafId = requestAnimationFrame(tick);
+}
+
+function play() {
+  items = buildTimeline();
+  if (!items.length) { statusEl.textContent = 'লেখা কিছু নেই। আগে লেখা দাও।'; return; }
+
+  total = audioLength > 0 ? audioLength + TAIL_SEC : items[items.length - 1].t + items[items.length - 1].dur + TAIL_SEC;
+
+  buildScenes();
+  render(0);
+  running = true;
+  startTime = performance.now();
+  if (player.src) {
+    player.currentTime = 0;
+    player.play().catch(() => { statusEl.textContent = 'ভয়েস চালু হয়নি। আবার "চালাও" চাপো।'; });
+  }
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(tick);
+  statusEl.textContent = 'চলছে... মোট সময়: ' + total.toFixed(0) + ' সেকেন্ড';
+}
+
+function finish(message) {
+  running = false;
+  cancelAnimationFrame(rafId);
+  player.pause();
+  if (recorder && recorder.state !== 'inactive') {
+    setTimeout(() => { if (recorder && recorder.state !== 'inactive') recorder.stop(); }, 500);
+  }
+  statusEl.textContent = message;
+}
+
+async function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || !window.MediaRecorder) {
+    statusEl.textContent = 'এই ব্রাউজারে রেকর্ড সম্ভব নয়। কম্পিউটারের Chrome বা Edge ব্যবহার করো।';
+    return;
+  }
+  try {
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true });
+  } catch (e) {
+    statusEl.textContent = 'রেকর্ড শুরু করা গেল না: ' + e.message;
+    return;
+  }
+  chunks = [];
+  const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+  recorder = new MediaRecorder(screenStream, { mimeType: mime });
+  recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'motion-video.webm';
+    a.click();
+    screenStream.getTracks().forEach(t => t.stop());
+    statusEl.textContent = 'ভিডিও ডাউনলোড হয়েছে (WebM)। MP4 লাগলে কনভার্ট করো।';
+  };
+  recorder.start();
+  statusEl.textContent = 'রেকর্ড হচ্ছে... শেয়ার উইন্ডোতে "This tab" আর "Share tab audio" বেছে নাও।';
+  play();
+}
+
+function stopRecording() {
+  finish('থামানো হয়েছে।');
+}
+
+playBtn.addEventListener('click', play);
+recBtn.addEventListener('click', startRecording);
+stopBtn.addEventListener('click', stopRecording);
+</script>
+</body>
+</html>
