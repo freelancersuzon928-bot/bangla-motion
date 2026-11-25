@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>বাংলা মোশন টেক্সট ভিডিও</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0b0f1a; color:#e5e7eb; font-family:'Noto Sans Bengali',sans-serif; padding:16px; }
+  .controls { max-width:900px; margin:0 auto; display:grid; gap:10px; }
+  textarea { width:100%; height:170px; background:#111827; color:#f8fafc; border:1px solid #334155; border-radius:8px; padding:10px; font-family:inherit; font-size:15px; box-sizing:border-box; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  button, select { background:#1e293b; color:#f8fafc; border:1px solid #334155; border-radius:8px; padding:8px 14px; font-family:inherit; font-size:14px; cursor:pointer; }
+  button.primary { background:#0891b2; }
+  .status { font-size:13px; color:#94a3b8; }
+  .stage-wrap { display:flex; justify-content:center; margin:20px 0; }
+  #stage { position:relative; background:#070b14; overflow:hidden; border-radius:12px; box-shadow:0 0 0 1px #334155; }
+  #stage.vertical { width:360px; height:640px; }
+  #stage.horizontal { width:854px; height:480px; max-width:100%; }
+  .grid { position:absolute; inset:0; background-image:linear-gradient(rgba(34,211,238,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.08) 1px,transparent 1px); background-size:40px 40px; }
+  #progress { position:absolute; top:0; left:0; height:4px; width:0; background:linear-gradient(90deg,#22d3ee,#facc15); }
+  .scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:40px; box-sizing:border-box; opacity:0; transform:translateY(24px); transition:opacity .5s, transform .5s; }
+  .scene.active { opacity:1; transform:translateY(0); }
+  .scene span { font-weight:900; line-height:1.6; color:#f8fafc; font-size:30px; }
+  #stage.vertical .scene span { font-size:26px; }
+  .scene em { font-style:normal; color:#facc15; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <textarea id="script">0|আজ আমি তোমাদের একটা গল্প বলব
+4|একটা ছোট্ট গ্রামে বাস করত এক কিশোর
+9|তার স্বপ্ন ছিল <em>বড় হয়ে কিছু করার</em>
+14|কিন্তু পথটা ছিল কঠিন
+18|তবু সে হাল ছাড়েনি
+23|প্রতিদিন সে একটু একটু করে এগিয়েছে
+29|আর একদিন, সে নিজের স্বপ্ন ছুঁয়ে ফেলল
+35|মনে রেখো, চেষ্টা কখনো বৃথা যায় না</textarea>
+
+  <div class="row">
+    <label>ফরম্যাট:
+      <select id="format">
+        <option value="vertical">9:16 (Reels/Shorts)</option>
+        <option value="horizontal">16:9 (ল্যান্ডস্কেপ)</option>
+      </select>
+    </label>
+    <label>ভয়েস ফাইল: <input type="file" id="audio" accept="audio/*"></label>
+  </div>
+
+  <div class="row">
+    <button id="play" class="primary">▶ চালাও</button>
+    <button id="rec">⏺ রেকর্ড শুরু</button>
+    <button id="stop">⏹ থামাও</button>
+  </div>
+
+  <div class="status" id="status">প্রতি লাইনে লেখো: সেকেন্ড|টেক্সট। ভয়েস ফাইল দাও, তারপর চালাও।</div>
+</div>
+
+<div class="stage-wrap">
+  <div id="stage" class="vertical">
+    <div class="grid"></div>
+    <div id="progress"></div>
+  </div>
+</div>
+
+<audio id="player"></audio>
+
+<script>
+const stage = document.getElementById('stage');
+const formatSel = document.getElementById('format');
+const scriptEl = document.getElementById('script');
+const audioInput = document.getElementById('audio');
+const player = document.getElementById('player');
+const playBtn = document.getElementById('play');
+const recBtn = document.getElementById('rec');
+const stopBtn = document.getElementById('stop');
+const statusEl = document.getElementById('status');
+const progress = document.getElementById('progress');
+
+let lines = [], total = 0, startTime = 0, rafId = null, playing = false;
+let recorder = null, chunks = [], screenStream = null;
+
+function parseScript() {
+  const parsed = scriptEl.value.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const i = l.indexOf('|');
+    const t = i > -1 ? parseFloat(l.slice(0, i)) : 0;
+    let text = i > -1 ? l.slice(i + 1) : l;
+    text = text.replace(/</g, '&lt;').replace(/&lt;(\/?)em&gt;/g, '<$1em>');
+    return { t: isNaN(t) ? 0 : t, html: text };
+  });
+  return parsed.sort((a, b) => a.t - b.t);
+}
+
+function buildScenes() {
+  stage.querySelectorAll('.scene').forEach(s => s.remove());
+  lines.forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'scene';
+    div.innerHTML = '<span>' + l.html + '</span>';
+    stage.appendChild(div);
+  });
+}
+
+function setFormat() {
+  stage.className = formatSel.value;
+}
+formatSel.addEventListener('change', setFormat);
+setFormat();
+
+audioInput.addEventListener('change', () => {
+  if (audioInput.files[0]) {
+    player.src = URL.createObjectURL(audioInput.files[0]);
+    statusEl.textContent = 'ভয়েস যুক্ত হয়েছে। এখন চালাও বা রেকর্ড করো।';
+  }
+});
+
+function render(time) {
+  const scenes = stage.querySelectorAll('.scene');
+  let idx = -1;
+  lines.forEach((l, i) => { if (time >= l.t) idx = i; });
+  scenes.forEach((s, i) => s.classList.toggle('active', i === idx));
+  progress.style.width = Math.min(time / total, 1) * 100 + '%';
+}
+
+function tick() {
+  const time = (player.src && !player.paused) ? player.currentTime : (performance.now() - startTime) / 1000;
+  render(time);
+  if (time >= total) { stopPlayback(); statusEl.textContent = 'শেষ হয়েছে।'; return; }
+  rafId = requestAnimationFrame(tick);
+}
+
+function play() {
+  lines = parseScript();
+  if (!lines.length) { statusEl.textContent = 'স্ক্রিপ্টে কোনো লাইন নেই।'; return; }
+  total = lines[lines.length - 1].t + 5;
+  buildScenes();
+  playing = true;
+  startTime = performance.now();
+  if (player.src) { player.currentTime = 0; player.play(); }
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(tick);
+  statusEl.textContent = 'চলছে...';
+}
+
+function stopPlayback() {
+  playing = false;
+  cancelAnimationFrame(rafId);
+  player.pause();
+}
+
+async function startRecording() {
+  try {
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true });
+  } catch (e) {
+    statusEl.textContent = 'রেকর্ড শুরু করা গেল না: ' + e.message;
+    return;
+  }
+  chunks = [];
+  recorder = new MediaRecorder(screenStream, { mimeType: 'video/webm' });
+  recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'motion-video.webm';
+    a.click();
+    screenStream.getTracks().forEach(t => t.stop());
+    statusEl.textContent = 'ভিডিও সেভ হয়েছে (WebM)। MP4 লাগলে কনভার্ট করো।';
+  };
+  recorder.start();
+  statusEl.textContent = 'রেকর্ড হচ্ছে... (স্ক্রিন শেয়ারে "This tab" এবং "Share tab audio" বেছে নাও)';
+  play();
+}
+
+function stopRecording() {
+  if (recorder && recorder.state !== 'inactive') recorder.stop();
+  stopPlayback();
+}
+
+playBtn.addEventListener('click', play);
+recBtn.addEventListener('click', startRecording);
+stopBtn.addEventListener('click', stopRecording);
+</script>
+</body>
+</html>
